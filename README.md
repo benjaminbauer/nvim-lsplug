@@ -20,7 +20,17 @@ local lsplug = require("nvim-lsplug")
 -- valid servers: https://github.com/williamboman/nvim-lsp-installer/#available-lsps
 lsplug.add("sumneko_lua")
 lsplug.add("vimls")
+-- optionally add data to pass through to setup
+lsplug.add("jsonls", {commands = {
+      Format = {
+        function()
+          vim.lsp.buf.range_formatting({},{0,0},{vim.fn.line("$"),0})
+        end
+      }
+    }})
 lsplug.add(..)
+
+lsplug.finish()
 ```
 ## Commands
 | Command                             | Description                                                        |

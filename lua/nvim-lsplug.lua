@@ -3,8 +3,9 @@ local lsp_installer_servers = require "nvim-lsp-installer.servers"
 
 local M = {}
 local configured_servers = {}
+local explicit_setup_options = {}
 
-function M.add(servername)
+function M.add(servername, setup_options)
   local ok, _ = lsp_installer.get_server(servername)
 
   if not ok then
@@ -12,6 +13,10 @@ function M.add(servername)
   end
 
   table.insert(configured_servers, servername)
+
+  if setup_options then
+    explicit_setup_options[servername] = setup_options
+  end
 end
 
 function M.install()
@@ -81,6 +86,20 @@ function M.clean()
   else
     print("aborted")
   end
+end
+
+function M.finish()
+  -- Register a handler that will be called for all installed servers.
+  -- Alternatively, you may also register handlers on specific server instances instead (see example below).
+  lsp_installer.on_server_ready(function(server)
+      local opts = {}
+
+      if explicit_setup_options[server.name] then
+        opts = explicit_setup_options[server.name]
+      end
+
+      server:setup(opts)
+    end)
 end
 
 function M.init()
